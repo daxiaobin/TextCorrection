@@ -1,0 +1,6 @@
+ip 192.168.162.128
+port 20000
+corpus_chinese /home/lucky/c++/new_project1/data/src_data/chinese
+corpus_english /home/lucky/c++/new_project1/data/src_data/english
+dict_chinese   /home/lucky/c++/new_project1/data/dict/chinese/chinese.txt
+dict_english   /home/lucky/c++/new_project1/data/dict/english/english.txt
