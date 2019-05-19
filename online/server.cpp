@@ -1,12 +1,11 @@
-#ifndef SERVER_H
-#define SERVER_H
-
 #include "codec.h"
 #include "indexDict.h"
+#include "task.h"
 #include "muduo/base/Logging.h"
 #include "muduo/base/Mutex.h"
 #include "muduo/net/TcpServer.h"
 #include "muduo/net/EventLoop.h"
+#include <boost/regex.hpp>
 
 #include <json/json.h>
 #include <stdio.h>
@@ -15,6 +14,9 @@
 
 using namespace muduo::net;
 using namespace muduo;
+
+//全局单例对象
+IndexDict* dict = IndexDict::getInstance();
 
 class CorrectionServer
 {
@@ -39,6 +41,7 @@ private:
 	TcpServer _server;
 	LengthHeaderCodec _codec;
 	Connections _connections;//用于保存所有连接的客户端
+	Task _myTask;
 };
 
 void CorrectionServer::onConnection(const TcpConnectionPtr& conn)
@@ -59,20 +62,23 @@ void CorrectionServer::onConnection(const TcpConnectionPtr& conn)
 
 void CorrectionServer::onStringMessage(const TcpConnectionPtr& conn, const string& message, Timestamp)
 {
-	
+	string src_message = message;
+	boost::regex reg("[^a-z]");
+	string des_message = boost::regex_replace(src_message, reg, "");
+
+	string result = _myTask.search(des_message);
 
 	Json::Value root;
+	root["des_string"] = Json::Value(result);
 	root["src_string"] = Json::Value(message);
-	root["des_string"] = Json::Value(message);
 	Json::StyledWriter sw;
 	string news = sw.write(root);
+
 	_codec.send(conn, news);
 }
 
 int main(int argc, char* argv[])
 {
-//	IndexDict* dict = IndexDict::getInstance();
-//	dict->display();
 	LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 	if(argc > 1)
 	{
@@ -90,6 +96,3 @@ int main(int argc, char* argv[])
 	}
 }
 
-
-
-#endif

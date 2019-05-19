@@ -31,11 +31,11 @@ public:
 		return _instance;
 	}
 
-	vector<pair<string, int> >* getIndexEnglish() 
-	{	return &_indexEnglish;	}
+	vector<pair<string, int> >& getIndexEnglish() 
+	{	return _indexEnglish;	}
 
-	map<char, set<int> >* getIndexCharacter()
-	{	return &_indexCharacter;	}
+	map<char, set<int> >& getIndexCharacter()
+	{	return _indexCharacter;	}
 
 	void display() 
 	{
